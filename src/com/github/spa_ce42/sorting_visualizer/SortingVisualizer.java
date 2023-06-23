@@ -4,11 +4,14 @@ import com.github.spa_ce42.sorting_visualizer.internal.Window;
 import com.github.spa_ce42.sorting_visualizer.sorts.BubbleSort;
 import com.github.spa_ce42.sorting_visualizer.sorts.DualPivotQuicksort;
 import com.github.spa_ce42.sorting_visualizer.sorts.DualPivotQuicksort2;
+import com.github.spa_ce42.sorting_visualizer.sorts.HeapSort;
 import com.github.spa_ce42.sorting_visualizer.sorts.Mergesort;
 import com.github.spa_ce42.sorting_visualizer.sorts.Metadata;
 import com.github.spa_ce42.sorting_visualizer.sorts.Quicksort;
+import com.github.spa_ce42.sorting_visualizer.sorts.ThreeWayQuicksort;
 import com.github.spa_ce42.sorting_visualizer.sorts.TimSort;
 
+import java.security.SecureRandom;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -95,6 +98,16 @@ public class SortingVisualizer {
             shuffle(va, r);
             Thread.sleep(1000);
             DualPivotQuicksort2.sort(va);
+
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            HeapSort.sort(va);
+
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            ThreeWayQuicksort.sort(va);
 
             Thread.sleep(1000);
             shuffle(va, r);
