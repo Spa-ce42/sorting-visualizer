@@ -3,8 +3,11 @@ package com.github.spa_ce42.sorting_visualizer;
 import com.github.spa_ce42.sorting_visualizer.internal.Window;
 import com.github.spa_ce42.sorting_visualizer.sorts.BubbleSort;
 import com.github.spa_ce42.sorting_visualizer.sorts.DualPivotQuicksort;
+import com.github.spa_ce42.sorting_visualizer.sorts.DualPivotQuicksort2;
 import com.github.spa_ce42.sorting_visualizer.sorts.Mergesort;
+import com.github.spa_ce42.sorting_visualizer.sorts.Metadata;
 import com.github.spa_ce42.sorting_visualizer.sorts.Quicksort;
+import com.github.spa_ce42.sorting_visualizer.sorts.TimSort;
 
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
@@ -12,6 +15,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class SortingVisualizer {
@@ -20,9 +24,10 @@ public class SortingVisualizer {
     private final VArray va;
 
     public SortingVisualizer() {
-        this.window = new Window(1280, 720, "Program", NULL, NULL);
+        this.window = new Window(2560, 1440, "Sorting Visualizer", NULL, NULL);
         this.shouldRun = true;
         this.va = new VArray(1 << 14);
+        this.window.addWindowSizeCallback((l, i, i1) -> glViewport(0, 0, i, i1));
     }
 
     public void start() {
@@ -35,13 +40,12 @@ public class SortingVisualizer {
         this.window.dispose();
     }
 
-    private static final long SHUFFLE_SLEEP_NANOS = 35000;
     private static void shuffle(VArray va, Random r) {
         int lastI = 0;
         int lastJ = 0;
 
         for(int i = 0, n = va.size(); i < n; ++i) {
-            long expectedNano = System.nanoTime() + SHUFFLE_SLEEP_NANOS;
+            long expectedNano = System.nanoTime() + Metadata.SLEEP_NANOS;
 
             va.setColor(i, 1, 0, 0);
             int j = r.nextInt(n - i) + i;
@@ -85,24 +89,32 @@ public class SortingVisualizer {
 
         VArray va = sv.get().va;
         Random r = new Random();
-        Thread.sleep(1000);
-        shuffle(va, r);
-        Thread.sleep(1000);
-        BubbleSort.sort(va);
 
-        Thread.sleep(1000);
-        shuffle(va, r);
-        Thread.sleep(1000);
-        Mergesort.sort(va);
+        while(sv.get().shouldRun) {
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            DualPivotQuicksort2.sort(va);
 
-        Thread.sleep(1000);
-        shuffle(va, r);
-        Thread.sleep(1000);
-        Quicksort.sort(va);
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            TimSort.sort(va);
 
-        Thread.sleep(1000);
-        shuffle(va, r);
-        Thread.sleep(1000);
-        DualPivotQuicksort.sort(va);
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            Mergesort.sort(va);
+
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            Quicksort.sort(va);
+
+            Thread.sleep(1000);
+            shuffle(va, r);
+            Thread.sleep(1000);
+            BubbleSort.sort(va);
+        }
     }
 }

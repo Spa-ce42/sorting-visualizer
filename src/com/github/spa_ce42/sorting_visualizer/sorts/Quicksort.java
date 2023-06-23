@@ -3,9 +3,10 @@ package com.github.spa_ce42.sorting_visualizer.sorts;
 import com.github.spa_ce42.sorting_visualizer.Highlighter;
 import com.github.spa_ce42.sorting_visualizer.VArray;
 
+import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.SLEEP_NANOS;
+
 public class Quicksort {
     private static Highlighter h;
-    private static final long SLEEP_NANOS = 30000;
 
     private static int partition(int low, int high)
     {
