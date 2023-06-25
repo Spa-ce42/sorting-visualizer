@@ -11,11 +11,13 @@ import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glCompileShader;
 import static org.lwjgl.opengl.GL20.glCreateProgram;
 import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDeleteShader;
 import static org.lwjgl.opengl.GL20.glDetachShader;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
@@ -43,6 +45,10 @@ public class Shader {
         glUseProgram(this.program);
     }
 
+    public void unbind() {
+        glUseProgram(0);
+    }
+
     public int getUniformLocation(String name) {
         return glGetUniformLocation(this.program, name);
     }
@@ -52,5 +58,14 @@ public class Shader {
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
         matrix4f.get(fb);
         glUniformMatrix4fv(i, false, fb);
+    }
+
+    public void setInteger(String name, int i) {
+        int j = this.getUniformLocation(name);
+        glUniform1i(j, i);
+    }
+
+    public void dispose() {
+        glDeleteProgram(this.program);
     }
 }

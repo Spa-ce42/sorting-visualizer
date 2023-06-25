@@ -41,4 +41,15 @@ public class Highlighter {
         this.highlight(j, 1, 0, 0);
         this.va.swap(i, j);
     }
+
+    public void clear() {
+        for(int i = 0; i < this.indices.length; ++i) {
+            this.va.setColor(this.indices[i], 1, 1, 1);
+            this.indices[i] = 0;
+        }
+    }
+
+    public VArray getVArray() {
+        return this.va;
+    }
 }

@@ -3,6 +3,8 @@ package com.github.spa_ce42.sorting_visualizer.sorts;
 import com.github.spa_ce42.sorting_visualizer.Highlighter;
 import com.github.spa_ce42.sorting_visualizer.VArray;
 
+import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.MAX_HIGHLIGHTS;
+
 public class BubbleSort {
     private static Highlighter h;
     private static final long SLEEP_NANOS = 0;
@@ -39,7 +41,8 @@ public class BubbleSort {
     }
 
     public static void sort(VArray va) {
-        h = new Highlighter(va, 10);
+        h = new Highlighter(va, MAX_HIGHLIGHTS);
         bubbleSort(va.size());
+        h.clear();
     }
 }

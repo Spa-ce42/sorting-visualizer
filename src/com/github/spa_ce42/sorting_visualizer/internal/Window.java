@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_POSITION_X;
+import static org.lwjgl.glfw.GLFW.GLFW_POSITION_Y;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
@@ -17,10 +21,11 @@ import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
@@ -29,6 +34,7 @@ public class Window {
     private final long window;
     private int width;
     private int height;
+    private String title;
     private final List<GLFWWindowSizeCallbackI> windowSizeCallbacks;
     private final List<GLFWKeyCallbackI> keyCallbacks;
 
@@ -37,9 +43,15 @@ public class Window {
             throw new IllegalStateException("Failed to initialize GLFW");
         }
 
+        GLFWVidMode glfwVidMode = Objects.requireNonNull(glfwGetVideoMode(glfwGetPrimaryMonitor()));
+        glfwWindowHint(GLFW_POSITION_X, (glfwVidMode.width() - width) / 2);
+        glfwWindowHint(GLFW_POSITION_Y, (glfwVidMode.height() - height) / 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         this.width = width;
         this.height = height;
-        this.window = glfwCreateWindow(this.width, this.height, title, monitor, share);
+        this.title = title;
+        this.window = glfwCreateWindow(this.width, this.height, this.title, monitor, share);
         glfwMakeContextCurrent(this.window);
         GL.createCapabilities();
         glClearColor(0, 0, 0, 1);
@@ -59,10 +71,11 @@ public class Window {
                 keyCallback.invoke(window, key, scancode, action, mods);
             }
         });
+    }
 
-        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        Objects.requireNonNull(vidMode);
-        glfwSetWindowPos(this.window, (vidMode.width() - width) / 2, (vidMode.height() - height) / 2);
+    public void setTitle(String title) {
+        glfwSetWindowTitle(this.window, title);
+        this.title = title;
     }
 
     public void addWindowSizeCallback(GLFWWindowSizeCallbackI windowSizeCallback) {

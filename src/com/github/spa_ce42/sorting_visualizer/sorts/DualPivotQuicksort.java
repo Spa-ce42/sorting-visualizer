@@ -3,89 +3,63 @@ package com.github.spa_ce42.sorting_visualizer.sorts;
 import com.github.spa_ce42.sorting_visualizer.Highlighter;
 import com.github.spa_ce42.sorting_visualizer.VArray;
 
+import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.MAX_HIGHLIGHTS;
 import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.SLEEP_NANOS;
 
 public class DualPivotQuicksort {
     private static Highlighter h;
 
-    static void dualPivotQuickSort(int low, int high)
-    {
-        if (low < high)
-        {
+    public static void sort(VArray a) {
+        h = new Highlighter(a, MAX_HIGHLIGHTS);
+        sort(0, a.size() - 1);
+        h.clear();
+    }
 
-            // piv[] stores left pivot and right pivot.
-            // piv[0] means left pivot and
-            // piv[1] means right pivot
-            int[] piv;
-            piv = partition(low, high);
 
-            dualPivotQuickSort(low, piv[0] - 1);
-            dualPivotQuickSort(piv[0] + 1, piv[1] - 1);
-            dualPivotQuickSort(piv[1] + 1, high);
+    private static void sleep() {
+        long expectedTime = System.nanoTime() + SLEEP_NANOS;
+        while(true) {
+            if(System.nanoTime() > expectedTime) {
+                break;
+            }
         }
     }
 
-    static int[] partition(int low, int high)
-    {
-        if (h.get(low) > h.get(high))
-            h.swap(low, high);
+    // quicksort the subarray a[lo .. hi] using dual-pivot quicksort
+    private static void sort(int lo, int hi) {
+        if(hi <= lo) {
+            return;
+        }
 
-        // p is the left pivot, and q
-        // is the right pivot.
-        int j = low + 1;
-        int g = high - 1, k = low + 1,
-                p = h.get(low), q = h.get(high);
+        // make sure a[lo] <= a[hi]
+        if(h.get(hi) <= h.get(lo)) {
+            h.swap(lo, hi);
+        }
 
-        while (k <= g)
-        {
-            long expectedTime = System.nanoTime() + SLEEP_NANOS;
+        int lt = lo + 1, gt = hi - 1;
+        int i = lo + 1;
 
-            // If elements are less than the left pivot
-            if (h.get(k) < p)
-            {
-                h.swap(k, j);
-                j++;
-            }
-
-            // If elements are greater than or equal
-            // to the right pivot
-            else if (h.get(k) >= q)
-            {
-                while (h.get(g) > q && k < g)
-                    g--;
-
-                h.swap(k, g);
-                g--;
-
-                if (h.get(k) < p)
-                {
-                    h.swap(k, j);
-                    j++;
-                }
-            }
-            k++;
-
-            while(true) {
-                if(System.nanoTime() > expectedTime) {
-                    break;
-                }
+        while(i <= gt) {
+            sleep();
+            if(h.get(i) < h.get(lo)) {
+                h.swap(lt++, i++);
+            } else if(h.get(hi) < h.get(i)) {
+                h.swap(i, gt--);
+            } else {
+                i++;
             }
         }
-        j--;
-        g++;
 
-        // Bring pivots to their appropriate positions.
-        h.swap(low, j);
-        h.swap(high, g);
+        h.swap(lo, --lt);
+        h.swap(hi, ++gt);
 
-        // Returning the indices of the pivots
-        // because we cannot return two elements
-        // from a function, we do that using an array.
-        return new int[] { j, g };
-    }
+        // recursively sort three subarrays
+        sort(lo, lt - 1);
 
-    public static void sort(VArray va) {
-        h = new Highlighter(va, 10);
-        dualPivotQuickSort(0, va.size() - 1);
+        if(h.get(lt) < h.get(gt)) {
+            sort(lt + 1, gt - 1);
+        }
+
+        sort(gt + 1, hi);
     }
 }

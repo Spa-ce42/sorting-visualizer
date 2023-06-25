@@ -3,14 +3,16 @@ package com.github.spa_ce42.sorting_visualizer.sorts;
 import com.github.spa_ce42.sorting_visualizer.Highlighter;
 import com.github.spa_ce42.sorting_visualizer.VArray;
 
+import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.MAX_HIGHLIGHTS;
 import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.sleep;
 
 public class HeapSort {
     private static Highlighter h;
 
     public static void sort(VArray va) {
-        h = new Highlighter(va, 10);
+        h = new Highlighter(va, MAX_HIGHLIGHTS);
         sort(va.size());
+        h.clear();
     }
 
     static void sort(int N)

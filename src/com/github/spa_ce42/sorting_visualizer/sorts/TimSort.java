@@ -3,6 +3,7 @@ package com.github.spa_ce42.sorting_visualizer.sorts;
 import com.github.spa_ce42.sorting_visualizer.Highlighter;
 import com.github.spa_ce42.sorting_visualizer.VArray;
 
+import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.MAX_HIGHLIGHTS;
 import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.SLEEP_NANOS;
 
 public class TimSort {
@@ -19,8 +20,9 @@ public class TimSort {
     }
 
     public static void sort(VArray va) {
-        h = new Highlighter(va, 10);
+        h = new Highlighter(va, MAX_HIGHLIGHTS);
         timSort(va.size());
+        h.clear();
     }
 
     public static int minRunLength(int n)
