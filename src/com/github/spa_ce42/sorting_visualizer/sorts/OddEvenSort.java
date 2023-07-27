@@ -3,8 +3,6 @@ package com.github.spa_ce42.sorting_visualizer.sorts;
 import com.github.spa_ce42.sorting_visualizer.Highlighter;
 import com.github.spa_ce42.sorting_visualizer.VArray;
 
-import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.sleep;
-
 public class OddEvenSort {
     private static Highlighter h;
 

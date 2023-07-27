@@ -32,14 +32,14 @@ public class Highlighter {
     }
 
     public void set(int index, int i) {
-        this.highlight(index, 1, 0, 0);
         this.va.set(index, i);
+        this.highlight(index, 1, 0, 0);
     }
 
     public void swap(int i, int j) {
+        this.va.swap(i, j);
         this.highlight(i, 1, 0, 0);
         this.highlight(j, 1, 0, 0);
-        this.va.swap(i, j);
     }
 
     public void clear() {

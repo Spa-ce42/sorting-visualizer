@@ -1,21 +1,13 @@
 package com.github.spa_ce42.sorting_visualizer;
 
+import com.github.spa_ce42.sorting_visualizer.internal.ActionBuffer;
 import com.github.spa_ce42.sorting_visualizer.internal.Renderer;
-
-import java.util.LinkedList;
 
 public class VArray {
     private final int[] a;
     private final float x;
     private final float y;
-    private final LinkedList<DrawQuadAction> actions;
-    private final Object LOCK0 = new Object();
-    private final Object LOCK1 = new Object();
-
-
-    public record DrawQuadAction(float blx, float bly, float trx, float try_, float r, float g, float b) {
-
-    }
+    private final ActionBuffer actions;
 
     public void resize(int width, int height) {
         Renderer.resize(width, height);
@@ -30,7 +22,7 @@ public class VArray {
 
     public VArray(int width, int height, int size) {
         this.a = new int[size];
-        this.actions = new LinkedList<>();
+        this.actions = new ActionBuffer(100000);
 
         for(int i = 0; i < this.a.length; ++i) {
             this.a[i] = i;
@@ -42,35 +34,32 @@ public class VArray {
     }
 
     public void setColor(int index, float r, float g, float b) {
-        synchronized(this.LOCK0) {
-            while(this.actions.size() == 100000) {
+        synchronized(this.actions) {
+            while(this.actions.isFull()) {
                 try {
-                    this.LOCK0.wait();
+                    this.actions.wait();
                 } catch(InterruptedException ignored) {
 
                 }
             }
 
             int j = this.a[index];
-            DrawQuadAction dqa = new DrawQuadAction(index * this.x, 0, (index + 1) * this.x, (j + 1) * this.y, r, g, b);
-            this.actions.add(dqa);
+            this.actions.add(index * this.x, 0, (index + 1) * this.x, (j + 1) * this.y, r, g, b);
         }
     }
 
     public void set(int index, int i) {
-        synchronized(this.LOCK1) {
-            while(this.actions.size() == 100000) {
+        synchronized(this.actions) {
+            while(this.actions.isFull()) {
                 try {
-                    this.LOCK1.wait();
+                    this.actions.wait();
                 } catch(InterruptedException ignored) {
 
                 }
             }
 
-            DrawQuadAction dqa = new DrawQuadAction(index * this.x, 0, (index + 1) * this.x, 1, 0, 0, 0);
-            this.actions.add(dqa);
-            DrawQuadAction dqb = new DrawQuadAction(index * this.x, 0, (index + 1) * this.x, (i + 1) * this.y, 1, 1, 1);
-            this.actions.add(dqb);
+            this.actions.add(index * this.x, 0, (index + 1) * this.x, 1, 0, 0, 0);
+            this.actions.add(index * this.x, 0, (index + 1) * this.x, (i + 1) * this.y, 1, 1, 1);
             this.a[index] = i;
         }
     }
@@ -88,24 +77,20 @@ public class VArray {
     }
 
     public void draw() {
-        synchronized(this.LOCK0) {
-            synchronized(this.LOCK1) {
-                if(this.actions.isEmpty()) {
-                    Renderer.render();
-                    return;
-                }
-
-
-                while(!this.actions.isEmpty()) {
-                    DrawQuadAction dqa = this.actions.poll();
-                    Renderer.drawQuad(dqa.blx, dqa.bly, dqa.trx, dqa.try_, dqa.r, dqa.g, dqa.b);
-                }
-
-                Renderer.push();
+        synchronized(this.actions) {
+            if(this.actions.isEmpty()) {
                 Renderer.render();
-                this.LOCK0.notify();
-                this.LOCK1.notify();
+                return;
             }
+
+            while(!this.actions.isEmpty()) {
+                Renderer.drawQuad(this.actions.poll(), this.actions.poll(), this.actions.poll(), this.actions.poll(), this.actions.poll(), this.actions.poll(), this.actions.poll());
+            }
+
+            this.actions.reset();
+            Renderer.push();
+            Renderer.render();
+            this.actions.notify();
         }
     }
 

@@ -1,10 +1,11 @@
 package com.github.spa_ce42.sorting_visualizer.internal;
 
-import java.util.Arrays;
+import org.lwjgl.system.MemoryUtil;
+
+import java.nio.FloatBuffer;
 
 import static com.github.spa_ce42.sorting_visualizer.internal.VertexArray.VertexAttribute.FLOAT2;
 import static com.github.spa_ce42.sorting_visualizer.internal.VertexArray.VertexAttribute.FLOAT3;
-import static com.github.spa_ce42.sorting_visualizer.internal.VertexArray.VertexAttribute.FLOAT4;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -27,11 +28,10 @@ public class Renderer {
     private static FrameBuffer fb;
     private static VertexArray colorVertexArray;
     private static int colorVertexBuffer;
-    private static float[] f;
+    private static FloatBuffer f;
     private static Shader colorShader;
     private static int position;
     private static OrthographicCamera oc;
-    private static int maxVertices;
     private static int vertices;
 
     private Renderer() {
@@ -39,7 +39,6 @@ public class Renderer {
     }
 
     public static void initialize(int maxQuads) {
-        maxVertices = 6 * maxQuads;
         //Setup rendering to Window
         {
             FrameBuffer.Specification s = new FrameBuffer.Specification();
@@ -110,9 +109,9 @@ public class Renderer {
             colorVertexBuffer = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, colorVertexBuffer);
 
-            f = new float[5 * 4 * maxQuads];
+            f = MemoryUtil.memAllocFloat(5 * 4 * maxQuads);
 
-            glBufferData(GL_ARRAY_BUFFER, (long)f.length * Float.BYTES, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, (long)f.capacity() * Float.BYTES, GL_DYNAMIC_DRAW);
             colorVertexArray.setVertexAttributes(FLOAT2, FLOAT3);
 
             int ibo = glGenBuffers();
@@ -169,35 +168,35 @@ public class Renderer {
     }
 
     public static void drawQuad(float bottomLeftX, float bottomLeftY, float topRightX, float topRightY, float r, float g, float b) {
-        if(position >= f.length) {
+        if(position >= f.capacity()) {
             push();
         }
 
         vertices = vertices + 6;
 
-        f[position++] = bottomLeftX;
-        f[position++] = bottomLeftY;
-        f[position++] = r;
-        f[position++] = g;
-        f[position++] = b;
+        f.put(position++, bottomLeftX);
+        f.put(position++, bottomLeftY);
+        f.put(position++, r);
+        f.put(position++, g);
+        f.put(position++, b);
 
-        f[position++] = topRightX;
-        f[position++] = bottomLeftY;
-        f[position++] = r;
-        f[position++] = g;
-        f[position++] = b;
+        f.put(position++, topRightX);
+        f.put(position++, bottomLeftY);
+        f.put(position++, r);
+        f.put(position++, g);
+        f.put(position++, b);
 
-        f[position++] = topRightX;
-        f[position++] = topRightY;
-        f[position++] = r;
-        f[position++] = g;
-        f[position++] = b;
+        f.put(position++, topRightX);
+        f.put(position++, topRightY);
+        f.put(position++, r);
+        f.put(position++, g);
+        f.put(position++, b);
 
-        f[position++] = bottomLeftX;
-        f[position++] = topRightY;
-        f[position++] = r;
-        f[position++] = g;
-        f[position++] = b;
+        f.put(position++, bottomLeftX);
+        f.put(position++, topRightY);
+        f.put(position++, r);
+        f.put(position++, g);
+        f.put(position++, b);
     }
 
     public static void push() {
@@ -212,6 +211,7 @@ public class Renderer {
         glDrawElements(GL_TRIANGLES, vertices, GL_UNSIGNED_INT, 0);
         fb.unbind();
         position = 0;
+        System.out.println(vertices / 4);
         vertices = 0;
     }
 

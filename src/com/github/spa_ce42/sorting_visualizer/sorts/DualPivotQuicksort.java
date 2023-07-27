@@ -8,9 +8,11 @@ import static com.github.spa_ce42.sorting_visualizer.sorts.Metadata.SLEEP_NANOS;
 
 public class DualPivotQuicksort {
     private static Highlighter h;
+    private static VArray va;
 
     public static void sort(VArray a) {
         h = new Highlighter(a, MAX_HIGHLIGHTS);
+        va = a;
         sort(0, a.size() - 1);
         h.clear();
     }
@@ -32,7 +34,7 @@ public class DualPivotQuicksort {
         }
 
         // make sure a[lo] <= a[hi]
-        if(h.get(hi) <= h.get(lo)) {
+        if(va.get(hi) <= va.get(lo)) {
             h.swap(lo, hi);
         }
 
@@ -41,9 +43,11 @@ public class DualPivotQuicksort {
 
         while(i <= gt) {
             sleep();
-            if(h.get(i) < h.get(lo)) {
+            int j = va.get(i);
+
+            if(j < va.get(lo)) {
                 h.swap(lt++, i++);
-            } else if(h.get(hi) < h.get(i)) {
+            } else if(va.get(hi) < j) {
                 h.swap(i, gt--);
             } else {
                 i++;
@@ -56,7 +60,7 @@ public class DualPivotQuicksort {
         // recursively sort three subarrays
         sort(lo, lt - 1);
 
-        if(h.get(lt) < h.get(gt)) {
+        if(va.get(lt) < va.get(gt)) {
             sort(lt + 1, gt - 1);
         }
 
