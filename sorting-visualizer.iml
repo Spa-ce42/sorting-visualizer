@@ -8,17 +8,17 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/lib/lwjgl-release-3.3.2-custom" />
+          <root url="file://$MODULE_DIR$/lib/lwjgl" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/lib/lwjgl-release-3.3.2-custom" />
+          <root url="file://$MODULE_DIR$/lib/lwjgl" />
         </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/lib/lwjgl-release-3.3.2-custom" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/lib/lwjgl-release-3.3.2-custom" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/lwjgl" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/lwjgl" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>
