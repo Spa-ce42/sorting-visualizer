@@ -47,6 +47,7 @@ public abstract class SV implements Runnable {
         this.window.addWindowSizeCallback((l, width, height) -> glViewport(0, 0, width, height));
         this.coloredIndices = new int[svConfig.getMaxColoredBars()];
         this.updateInterval = svConfig.getUpdateInterval();
+        this.autoColor = svConfig.isAutoColor();
     }
 
     public void init(SVConfiguration svConfig) {
@@ -89,7 +90,7 @@ public abstract class SV implements Runnable {
         }
     }
 
-    public void arraySet(int index, int value) {
+    public void set(int index, int value) {
         if(this.autoColor) {
             this.color(index, 1, 0, 0);
         }
@@ -104,7 +105,7 @@ public abstract class SV implements Runnable {
         HistogramRenderer.setHeight(index, (float)value / this.maxValue);
     }
 
-    public int arrayGet(int index) {
+    public int get(int index) {
         if(this.autoColor) {
             this.color(index, 1, 0, 0);
         }
@@ -112,7 +113,7 @@ public abstract class SV implements Runnable {
         return this.a[index];
     }
 
-    public void arraySwap(int i, int j) {
+    public void swap(int i, int j) {
         if(this.autoColor) {
             this.color(i, 1, 0, 0);
             this.color(j, 1, 0, 0);
@@ -121,11 +122,11 @@ public abstract class SV implements Runnable {
         int temp = this.a[i];
         this.a[i] = this.a[j];
         this.a[j] = temp;
-        this.arraySet(i, this.a[i]);
-        this.arraySet(j, this.a[j]);
+        this.set(i, this.a[i]);
+        this.set(j, this.a[j]);
     }
 
-    public int arrayLength() {
+    public int length() {
         return this.a.length;
     }
 
@@ -150,21 +151,18 @@ public abstract class SV implements Runnable {
     }
 
     public void color(int index, float r, float g, float b) {
-        if(this.coloredIndicesPosition >= this.coloredIndices.length) {
-            for(int coloredIndex : this.coloredIndices) {
-                HistogramRenderer.setColor(coloredIndex, 1, 1, 1);
-            }
-
-            this.coloredIndicesPosition = 0;
-        }
-
+        HistogramRenderer.setColor(this.coloredIndices[this.coloredIndicesPosition], 1, 1, 1);
         HistogramRenderer.setColor(index, r, g, b);
         this.coloredIndices[this.coloredIndicesPosition++] = index;
+
+        if(coloredIndicesPosition >= this.coloredIndices.length) {
+            this.coloredIndicesPosition = 0;
+        }
     }
 
     public void setMaxColoredBars(int max) {
-        for(int i = 0; i < this.coloredIndicesPosition; ++i) {
-            HistogramRenderer.setColor(this.coloredIndices[i], 1, 1, 1);
+        for(int coloredIndex : this.coloredIndices) {
+            HistogramRenderer.setColor(coloredIndex, 1, 1, 1);
         }
 
         this.coloredIndicesPosition = 0;

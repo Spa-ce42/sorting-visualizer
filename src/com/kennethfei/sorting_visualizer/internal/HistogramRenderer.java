@@ -173,11 +173,11 @@ public class HistogramRenderer {
         histogramShader.bind();
         histogramVertexArray.bind();
 
-            glBindBuffer(GL_ARRAY_BUFFER, colorVertexBuffer);
-            glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, colorVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
 
-            glBindBuffer(GL_ARRAY_BUFFER, heightVertexBuffer);
-            glBufferData(GL_ARRAY_BUFFER, heightBuffer, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, heightVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, heightBuffer, GL_STATIC_DRAW);
 
         glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL, count);
     }
