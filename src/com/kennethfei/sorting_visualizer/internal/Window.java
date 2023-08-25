@@ -21,6 +21,7 @@ import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
@@ -102,5 +103,9 @@ public class Window {
     public void update() {
         glfwSwapBuffers(this.window);
         glfwPollEvents();
+    }
+
+    public void resize(int width, int height) {
+        glfwSetWindowSize(this.window, width, height);
     }
 }

@@ -13,21 +13,17 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public abstract class SV implements Runnable {
-    private final Window window;
-    private final boolean shouldRun;
+    private Window window;
     private int[] a;
     private int maxValue;
     private int[] coloredIndices;
     private int coloredIndicesPosition;
     private int updateInterval;
     private int updateCalls;
+    private boolean autoColor;
 
     public SV() {
-        this.window = new Window(1280, 720, "Sorting Visualizer", NULL, NULL);
-        this.shouldRun = true;
-        this.window.addWindowSizeCallback((l, i, i1) -> glViewport(0, 0, i, i1));
-        this.coloredIndices = new int[2];
-        this.updateInterval = 1;
+
     }
 
     private void start() {
@@ -35,13 +31,26 @@ public abstract class SV implements Runnable {
         this.run();
         this.window.update();
 
-        while(!this.window.shouldClose() && this.shouldRun) {
+        while(!this.window.shouldClose()) {
             this.window.clear(GL_COLOR_BUFFER_BIT);
             HistogramRenderer.render();
             this.window.update();
         }
 
         this.window.dispose();
+    }
+
+    private void initialize() {
+        SVConfiguration svConfig = new SVConfiguration();
+        this.init(svConfig);
+        this.window = new Window(svConfig.getWidth(), svConfig.getHeight(), svConfig.getTitle(), NULL, NULL);
+        this.window.addWindowSizeCallback((l, width, height) -> glViewport(0, 0, width, height));
+        this.coloredIndices = new int[svConfig.getMaxColoredBars()];
+        this.updateInterval = svConfig.getUpdateInterval();
+    }
+
+    public void init(SVConfiguration svConfig) {
+
     }
 
     @Override
@@ -81,6 +90,10 @@ public abstract class SV implements Runnable {
     }
 
     public void arraySet(int index, int value) {
+        if(this.autoColor) {
+            this.color(index, 1, 0, 0);
+        }
+
         this.a[index] = value;
 
         if(value > this.maxValue) {
@@ -92,10 +105,19 @@ public abstract class SV implements Runnable {
     }
 
     public int arrayGet(int index) {
+        if(this.autoColor) {
+            this.color(index, 1, 0, 0);
+        }
+
         return this.a[index];
     }
 
     public void arraySwap(int i, int j) {
+        if(this.autoColor) {
+            this.color(i, 1, 0, 0);
+            this.color(j, 1, 0, 0);
+        }
+
         int temp = this.a[i];
         this.a[i] = this.a[j];
         this.a[j] = temp;
@@ -140,10 +162,6 @@ public abstract class SV implements Runnable {
         this.coloredIndices[this.coloredIndicesPosition++] = index;
     }
 
-    public void color(int index, int r, int g, int b) {
-        this.color(index, r / 255f, g / 255f, b / 255f);
-    }
-
     public void setMaxColoredBars(int max) {
         for(int i = 0; i < this.coloredIndicesPosition; ++i) {
             HistogramRenderer.setColor(this.coloredIndices[i], 1, 1, 1);
@@ -173,6 +191,10 @@ public abstract class SV implements Runnable {
         this.forceUpdate();
     }
 
+    public void setAutoColor(boolean flag) {
+        this.autoColor = flag;
+    }
+
     public static void launch(SV sv) {
         sv.start();
     }
@@ -182,6 +204,7 @@ public abstract class SV implements Runnable {
             Class<?> c = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
             Constructor<?> d = c.getDeclaredConstructor();
             SV sv = (SV)d.newInstance();
+            sv.initialize();
             HistogramRenderer.initialize(0);
             sv.start();
         } catch(ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException |
