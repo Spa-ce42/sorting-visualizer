@@ -35,6 +35,10 @@ public class HistogramRenderer {
 
     private static boolean initialized;
 
+    public static boolean isInitialized() {
+        return initialized;
+    }
+
     public static void initialize(int count) {
         if(initialized) {
             histogramVertexArray.dispose();
@@ -152,6 +156,10 @@ public class HistogramRenderer {
     }
 
     public static void setColor(int index, float r, float g, float b) {
+        if(index >= colorBuffer.capacity()) {
+            return;
+        }
+
         colorBuffer.put(index * 3 + 0, r);
         colorBuffer.put(index * 3 + 1, g);
         colorBuffer.put(index * 3 + 2, b);
