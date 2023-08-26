@@ -63,17 +63,19 @@ public class Main extends SV {
         return new int[] { j, g };
     }
 
+    private final int MAX_VALUE = 1 << 24;
+
     @Override
     public void init(SVConfiguration svConfig) {
         svConfig.setWidth(1280);
         svConfig.setHeight(720);
-        svConfig.setMaxColoredBars((1 << 14) / 100);
-        svConfig.setUpdateInterval(2);
+        svConfig.setMaxColoredBars(MAX_VALUE / 500);
+        svConfig.setUpdateInterval(256000);
+        svConfig.setAutoColor(false);
     }
 
     @Override
     public void run() {
-        final int MAX_VALUE = 1 << 14;
         int[] a = new int[MAX_VALUE];
 
         for(int i = 0; i < MAX_VALUE; ++i) {
@@ -83,7 +85,6 @@ public class Main extends SV {
         array(a);
         delay(1000);
         Random r = new Random();
-
         for(int i = 0, n = length(); i < n; ++i) {
             int j = r.nextInt(i, n);
             swap(i, j);
@@ -94,7 +95,6 @@ public class Main extends SV {
         forceUpdate();
 
         delay(1000);
-        setAutoColor(true);
         dualPivotQuickSort(0, length() - 1);
         clearColor();
         forceUpdate();
