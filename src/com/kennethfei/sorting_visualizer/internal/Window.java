@@ -2,6 +2,7 @@ package com.kennethfei.sorting_visualizer.internal;
 
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowCloseCallbackI;
 import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 import org.lwjgl.opengl.GL;
 
@@ -21,6 +22,7 @@ import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowCloseCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
@@ -103,6 +105,22 @@ public class Window {
     public void update() {
         glfwSwapBuffers(this.window);
         glfwPollEvents();
+    }
+
+    public void setExitOnClose(boolean flag) {
+        if(flag) {
+            glfwSetWindowCloseCallback(this.window, l -> {
+                glfwDestroyWindow(l);
+                glfwTerminate();
+                System.exit(0);
+            });
+
+            return;
+        }
+
+        glfwSetWindowCloseCallback(this.window, l -> {
+
+        });
     }
 
     public void resize(int width, int height) {

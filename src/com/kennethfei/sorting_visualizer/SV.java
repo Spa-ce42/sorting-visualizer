@@ -7,6 +7,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glViewport;
@@ -27,6 +29,7 @@ public abstract class SV implements Runnable {
     }
 
     private void start() {
+
         this.window.clear(GL_COLOR_BUFFER_BIT);
         this.run();
         this.window.update();
@@ -41,10 +44,18 @@ public abstract class SV implements Runnable {
     }
 
     private void initialize() {
+
         SVConfiguration svConfig = new SVConfiguration();
         this.init(svConfig);
         this.window = new Window(svConfig.getWidth(), svConfig.getHeight(), svConfig.getTitle(), NULL, NULL);
+        this.window.setExitOnClose(true);
         this.window.addWindowSizeCallback((l, width, height) -> glViewport(0, 0, width, height));
+        this.window.addKeyCallback((window, key, scancode, action, mods) -> {
+            if(key == GLFW_KEY_R && action == GLFW_PRESS) {
+                SV.this.run();
+            }
+        });
+
         this.coloredIndices = new int[svConfig.getMaxColoredBars()];
         this.updateInterval = svConfig.getUpdateInterval();
         this.autoColor = svConfig.isAutoColor();
@@ -139,15 +150,7 @@ public abstract class SV implements Runnable {
     public void delay(long delayMillis) {
         long delayNanos = TimeUnit.MILLISECONDS.toNanos(delayMillis);
         long expected = System.nanoTime() + delayNanos;
-
-        while(System.nanoTime() < expected) {
-            if(this.window.shouldClose()) {
-                this.window.dispose();
-                System.exit(0);
-            }
-
-            glfwPollEvents();
-        }
+        while(System.nanoTime() < expected);
     }
 
     public void color(int index, float r, float g, float b) {

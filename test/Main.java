@@ -17,7 +17,6 @@ public class Main extends SV {
         int i = lo + 1;
 
         while(i <= gt) {
-//            delay(20);
 
             if(get(i) < get(lo)) {
                 swap(lt++, i++);
@@ -57,7 +56,6 @@ public class Main extends SV {
         delay(1000);
         Random r = new Random();
         for(int i = 0, n = length(); i < n; ++i) {
-//            delay(20);
             int j = r.nextInt(i, n);
             swap(i, j);
             update();
