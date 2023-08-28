@@ -3,6 +3,9 @@ package com.kennethfei.sorting_visualizer.internal;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
@@ -23,6 +26,20 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class Shader {
     private final int program;
+
+    public static Shader createFromResources(String vertexShaderResourcePath, String fragmentShaderResourcePath) {
+        try {
+            InputStream is = Shader.class.getClassLoader().getResourceAsStream(vertexShaderResourcePath);
+            String v = new String(is.readAllBytes());
+            is.close();
+            is = Shader.class.getClassLoader().getResourceAsStream(fragmentShaderResourcePath);
+            String f = new String(is.readAllBytes());
+            is.close();
+            return new Shader(v, f);
+        } catch(IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     public Shader(String vertexShaderSource, String fragmentShaderSource) {
         this.program = glCreateProgram();

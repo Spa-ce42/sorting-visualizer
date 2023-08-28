@@ -16,6 +16,9 @@ import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -23,7 +26,7 @@ import static org.lwjgl.system.MemoryUtil.memAllocFloat;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class HistogramRenderer {
-    private static VertexArray histogramVertexArray;
+    private static int histogramVertexArray;
     private static int colorVertexBuffer;
     private static FloatBuffer colorBuffer;
     private static int heightVertexBuffer;
@@ -41,7 +44,7 @@ public class HistogramRenderer {
 
     public static void initialize(int count) {
         if(initialized) {
-            histogramVertexArray.dispose();
+            glDeleteVertexArrays(histogramVertexArray);
             glDeleteBuffers(colorVertexBuffer);
             memFree(colorBuffer);
             glDeleteBuffers(heightVertexBuffer);
@@ -53,7 +56,8 @@ public class HistogramRenderer {
         HistogramRenderer.count = count;
         oc = new OrthographicCamera(0, 1, 0, 1.05f);
 
-        histogramVertexArray = new VertexArray();
+        histogramVertexArray = glGenVertexArrays();
+        glBindVertexArray(histogramVertexArray);
 
         colorVertexBuffer = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, colorVertexBuffer);
@@ -92,56 +96,7 @@ public class HistogramRenderer {
                 2, 3, 0
         }, GL_STATIC_DRAW);
 
-        histogramShader = new Shader(
-                """
-                #version 330 core
-                
-                layout(location = 0) in vec3 color;
-                layout(location = 1) in float height;
-                
-                uniform mat4 viewProjectionMatrix;
-                uniform int count;
-                
-                out vec3 s_Color;
-                
-                void main() {
-                    float x, h, a;
-                    a = 1 / float(count);
-                    
-                    switch(gl_VertexID) {
-                        case 0:
-                            x = 0;
-                            h = 0;
-                            break;
-                        case 1:
-                            x = a;
-                            h = 0;
-                            break;
-                        case 2:
-                            x = a;
-                            h = height;
-                            break;
-                        default:
-                            x = 0;
-                            h = height;
-                            break;
-                    }
-                    
-                    gl_Position = viewProjectionMatrix * vec4(x + gl_InstanceID * a, h, 0, 1);
-                    s_Color = color;
-                }
-                """,
-                """
-                #version 330 core
-                
-                in vec3 s_Color;
-                out vec4 color;
-                
-                void main() {
-                    color = vec4(s_Color, 1);
-                }
-                """
-        );
+        histogramShader = Shader.createFromResources("assets/shaders/HistogramShader.vert.glsl", "assets/shaders/HistogramShader.frag.glsl");
 
         histogramShader.bind();
         histogramShader.setMatrix4f("viewProjectionMatrix", oc.getViewProjectionMatrix());
@@ -179,7 +134,7 @@ public class HistogramRenderer {
 
     public static void render() {
         histogramShader.bind();
-        histogramVertexArray.bind();
+        glBindVertexArray(histogramVertexArray);
 
         glBindBuffer(GL_ARRAY_BUFFER, colorVertexBuffer);
         glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
