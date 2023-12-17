@@ -81,7 +81,7 @@ public class Test extends SV {
         delay(1000);
         shuffle();
         delay(1000);
-        dualPivotQuickSort(0, length() - 1);
+        dualPivotQuickSort(0, length() - 1); // or any other algorithm a student writes
         clearColor();
     }
 }
