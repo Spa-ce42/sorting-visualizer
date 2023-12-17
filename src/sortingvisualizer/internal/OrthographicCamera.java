@@ -1,4 +1,4 @@
-package com.kennethfei.sorting_visualizer.internal;
+package sortingvisualizer.internal;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

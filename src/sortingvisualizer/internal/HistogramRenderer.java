@@ -1,4 +1,4 @@
-package com.kennethfei.sorting_visualizer.internal;
+package sortingvisualizer.internal;
 
 import org.lwjgl.system.MemoryUtil;
 

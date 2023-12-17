@@ -1,4 +1,4 @@
-package com.kennethfei.sorting_visualizer;
+package sortingvisualizer;
 
 public class SVConfiguration {
     private int width;

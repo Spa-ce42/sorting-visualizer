@@ -1,7 +1,7 @@
-package com.kennethfei.sorting_visualizer;
+package sortingvisualizer;
 
-import com.kennethfei.sorting_visualizer.internal.HistogramRenderer;
-import com.kennethfei.sorting_visualizer.internal.Window;
+import sortingvisualizer.internal.HistogramRenderer;
+import sortingvisualizer.internal.Window;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
