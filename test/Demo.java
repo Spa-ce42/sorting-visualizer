@@ -1,7 +1,7 @@
 import sortingvisualizer.SV;
 import java.util.Random;
 
-public class Test extends SV {
+public class Demo extends SV {
     public static void main(String[] args) {
         SV.launch();
     }
