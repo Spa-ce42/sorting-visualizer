@@ -1,5 +1,6 @@
 package com.kennethfei.sorting_visualizer.internal;
 
+import com.kennethfei.sorting_visualizer.ImGuiRenderer;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -37,6 +38,7 @@ public class HistogramRenderer {
     private static OrthographicCamera oc;
 
     private static boolean initialized;
+    private static ImGuiRenderer igr;
 
     public static boolean isInitialized() {
         return initialized;
@@ -130,6 +132,10 @@ public class HistogramRenderer {
 
     public static void setHeight(int index, float h) {
         heightBuffer.put(index, h);
+    }
+
+    public static void setImGuiRenderer(ImGuiRenderer igr) {
+        HistogramRenderer.igr = igr;
     }
 
     public static void render() {

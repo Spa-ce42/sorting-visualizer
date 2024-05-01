@@ -1,5 +1,6 @@
 package com.kennethfei.sorting_visualizer.internal;
 
+import imgui.ImGui;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowCloseCallbackI;
@@ -125,5 +126,9 @@ public class Window {
 
     public void resize(int width, int height) {
         glfwSetWindowSize(this.window, width, height);
+    }
+
+    public long getNativeWindow() {
+        return this.window;
     }
 }

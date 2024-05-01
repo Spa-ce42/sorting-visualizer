@@ -1,20 +1,23 @@
 package com.kennethfei.sorting_visualizer;
 
-import com.kennethfei.sorting_visualizer.internal.HistogramRenderer;
-import com.kennethfei.sorting_visualizer.internal.Window;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.TimeUnit;
-
+import static imgui.flag.ImGuiConfigFlags.ViewportsEnable;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public abstract class SV implements Runnable {
-    private Window window;
+import com.kennethfei.sorting_visualizer.internal.HistogramRenderer;
+import com.kennethfei.sorting_visualizer.internal.ImGuiUtil;
+import com.kennethfei.sorting_visualizer.internal.Window;
+import imgui.ImGui;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.TimeUnit;
+
+public abstract class SV implements Runnable, ImGuiRenderer {
+    protected Window window;
     private int[] a;
     private int maxValue;
     private int[] coloredIndices;
@@ -28,13 +31,14 @@ public abstract class SV implements Runnable {
     }
 
     private void start() {
-
         this.window.clear(GL_COLOR_BUFFER_BIT);
+        this.drawImGui();
         this.run();
         this.window.update();
 
         while(!this.window.shouldClose()) {
             this.window.clear(GL_COLOR_BUFFER_BIT);
+            this.drawImGui();
             HistogramRenderer.render();
             this.window.update();
         }
@@ -43,7 +47,6 @@ public abstract class SV implements Runnable {
     }
 
     private void initialize() {
-
         SVConfiguration svConfig = new SVConfiguration();
         this.init(svConfig);
         this.window = new Window(svConfig.getWidth(), svConfig.getHeight(), svConfig.getTitle(), NULL, NULL);
@@ -58,6 +61,7 @@ public abstract class SV implements Runnable {
         this.coloredIndices = new int[svConfig.getMaxColoredBars()];
         this.updateInterval = svConfig.getUpdateInterval();
         this.autoColor = svConfig.isAutoColor();
+        ImGuiUtil.initialize(this.window);
     }
 
     public void init(SVConfiguration svConfig) {
@@ -66,6 +70,8 @@ public abstract class SV implements Runnable {
 
     @Override
     public abstract void run();
+    @Override
+    public abstract void onImGuiRender();
 
     public void array(int[] a, int maxValue) {
         this.a = new int[a.length];
@@ -142,8 +148,25 @@ public abstract class SV implements Runnable {
 
     public void forceUpdate() {
         this.window.clear(GL_COLOR_BUFFER_BIT);
+        this.drawImGui();
         HistogramRenderer.render();
         this.window.update();
+    }
+
+    protected final void drawImGui() {
+        ImGuiUtil.imGuiImplGlfw.newFrame();
+        ImGui.newFrame();
+        this.onImGuiRender();
+        ImGui.endFrame();
+        ImGui.render();
+        ImGuiUtil.imGuiImplGl3.renderDrawData(ImGui.getDrawData());
+
+        if(ImGuiUtil.io.hasConfigFlags(ViewportsEnable)) {
+            long window = this.window.getNativeWindow();
+            ImGui.updatePlatformWindows();
+            ImGui.renderPlatformWindowsDefault();
+            glfwMakeContextCurrent(window);
+        }
     }
 
     public void delay(long delayMillis) {
